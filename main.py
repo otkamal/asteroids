@@ -24,16 +24,20 @@ def main():
     asteroidfield.AsteroidField.containers = (updatable)
 
     p = player.Player(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2)
-    a = asteroidfield.AsteroidField()
-    
+    asteroidfield.AsteroidField()
+
     dt = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print(f"Ending asteroids")
-                return
+                exit(0)
         screen.fill(constants.COLOR_BLACK)
         updatable.update(dt)
+        for a in asteroids:
+            if a.is_colliding(p):
+                print(f"Game over!")
+                exit(0)
         for d in drawable:
             d.draw(screen)
         pygame.display.flip()
