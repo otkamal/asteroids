@@ -10,6 +10,7 @@ def main():
     print("Starting asteroids!")
      
     pygame.init()
+    pygame.font.init()
 
     print(f"Screen width: {constants.SCREEN_WIDTH}")
     print(f"Screen height: {constants.SCREEN_HEIGHT}")
@@ -30,7 +31,9 @@ def main():
     asteroidfield.AsteroidField()
 
     dt = 0
+    score = 0
     while True:
+        font = pygame.font.Font(None, 36)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print(f"Ending asteroids")
@@ -47,8 +50,11 @@ def main():
                     print("collision detected")
                     a.split()
                     s.kill()
+                    score += 100
         for d in drawable:
             d.draw(screen)
+        score_text = font.render(f"Score: {score}", True, constants.COLOR_WHITE)
+        screen.blit(score_text, (10, 10))
         pygame.display.flip()
         dt = clock.tick(constants.MAX_FPS)
         # convert dt from milliseconds to seconds
