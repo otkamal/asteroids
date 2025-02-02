@@ -47,11 +47,12 @@ def main():
                 exit(0)
         screen.fill(constants.COLOR_BLACK)
         updatable.update(dt)
-        for a in asteroids:
-            if a.is_colliding(p):
-                print(f"You have died.")
-                print(f"Final Score: {score}")
-                exit(0)
+        booster_resource.update_available_resource(p.booster_reserves)
+        # for a in asteroids:
+        #     if a.is_colliding(p):
+        #         print(f"You have died.")
+        #         print(f"Final Score: {score}")
+        #         exit(0)
         for a in asteroids:
             for s in shots:
                 if a.is_colliding(s):
