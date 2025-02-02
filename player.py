@@ -9,6 +9,7 @@ class Player(circleshape.CircleShape):
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0
         self.weapon_cooldown = 0
+        self.booster_reserves = 1
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -26,8 +27,12 @@ class Player(circleshape.CircleShape):
             constants.PLAYER_LINE_WIDTH
         )
 
-    def move(self, dt):
+    def move(self, dt, with_boost = False):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        print(f"Boost Left = {self.booster_reserves}")
+        if with_boost:
+            self.position += forward * constants.PLAYER_SPEED * dt * constants.PLATER_BOOSTER_FACTOR
+            return
         self.position += forward * constants.PLAYER_SPEED * dt
     
     def rotate(self, dt):
@@ -49,6 +54,8 @@ class Player(circleshape.CircleShape):
         if keys[pygame.K_d]:
             self.rotate(dt)
         if keys[pygame.K_w]:
+            if keys[pygame.K_LSHIFT]:
+                self.move(dt, True)
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)

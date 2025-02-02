@@ -4,6 +4,7 @@ import player
 import asteroid
 import asteroidfield
 import shot
+import resourcebar
 
 def main():
 
@@ -21,13 +22,19 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
+    resources = pygame.sprite.Group()
 
     player.Player.containers = (updatable, drawable)
     asteroid.Asteroid.containers = (asteroids, updatable, drawable)
     asteroidfield.AsteroidField.containers = (updatable)
     shot.Shot.containers = (shots, updatable, drawable)
+    resourcebar.ResourceBar.containers = (drawable)
 
     p = player.Player(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2)
+    booster_resource = resourcebar.ResourceBar(
+        0 + constants.RESOURCE_BAR_PADDING,
+        constants.SCREEN_HEIGHT - constants.RESOURCE_BAR_HEIGHT - constants.RESOURCE_BAR_PADDING
+    )
     asteroidfield.AsteroidField()
 
     dt = 0
@@ -43,6 +50,7 @@ def main():
         for a in asteroids:
             if a.is_colliding(p):
                 print(f"You have died.")
+                print(f"Final Score: {score}")
                 exit(0)
         for a in asteroids:
             for s in shots:
