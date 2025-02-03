@@ -35,7 +35,6 @@ class Player(circleshape.CircleShape):
 
     def move(self, dt, with_boost = False):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        print(f"Boost Left = {self.booster_reserves}")
         if with_boost:
             self.position += forward * constants.PLAYER_SPEED * dt * constants.PLAYER_BOOSTER_FACTOR
             self.booster_reserves -= 0.025
@@ -60,8 +59,6 @@ class Player(circleshape.CircleShape):
 
         self.booster_cooldown -= dt
         self.booster_cooldown = max(0, self.booster_cooldown)
-
-        print(f"remaining cooldown: {self.booster_cooldown}")
 
         keys = pygame.key.get_pressed()
 
