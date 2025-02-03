@@ -12,8 +12,8 @@ def main():
      
     pygame.init()
     pygame.font.init()
-    background_track = pygame.mixer.Sound("sounds/background_music.mp3")
-    background_track.set_volume(0.2)
+    background_track = pygame.mixer.Sound(constants.FILEPATH_BACKGROUND_TRACK)
+    background_track.set_volume(constants.DEFAULT_VOLUME_BACKGROUND_TRACK)
     background_track.play(-1)
 
     print(f"Screen width: {constants.SCREEN_WIDTH}")

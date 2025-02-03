@@ -6,8 +6,8 @@ import random
 class Asteroid(circleshape.CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
-        self.__explosion_sound = pygame.mixer.Sound("sounds/asteroid_exploding.wav")
-        self.__explosion_sound.set_volume(0.15)
+        self.__explosion_sound = pygame.mixer.Sound(constants.FILEPATH_ASTEROID_EXPLOSION)
+        self.__explosion_sound.set_volume(constants.DEFAULT_VOLUME_ASTEROID_EXPLOSION)
 
     def draw(self, screen):
         pygame.draw.circle(

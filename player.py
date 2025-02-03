@@ -11,8 +11,8 @@ class Player(circleshape.CircleShape):
         self.weapon_cooldown = 0
         self.booster_reserves = 1
         self.booster_cooldown = 0
-        self.__shoot_sound = pygame.mixer.Sound("sounds/blaster_sound.wav")
-        self.__shoot_sound.set_volume(0.2)
+        self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
+        self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
