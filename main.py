@@ -12,6 +12,9 @@ def main():
      
     pygame.init()
     pygame.font.init()
+    background_track = pygame.mixer.Sound("sounds/background_music.mp3")
+    background_track.set_volume(0.2)
+    background_track.play(-1)
 
     print(f"Screen width: {constants.SCREEN_WIDTH}")
     print(f"Screen height: {constants.SCREEN_HEIGHT}")
@@ -22,7 +25,6 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
-    resources = pygame.sprite.Group()
 
     player.Player.containers = (updatable, drawable)
     asteroid.Asteroid.containers = (asteroids, updatable, drawable)

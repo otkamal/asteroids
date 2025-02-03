@@ -2,6 +2,7 @@ import pygame
 import circleshape
 import constants
 
+
 class Shot(circleshape.CircleShape):
     
     def __init__(self, x, y):

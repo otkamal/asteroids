@@ -6,7 +6,9 @@ import random
 class Asteroid(circleshape.CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
-    
+        self.__explosion_sound = pygame.mixer.Sound("sounds/asteroid_exploding.wav")
+        self.__explosion_sound.set_volume(0.15)
+
     def draw(self, screen):
         pygame.draw.circle(
             screen,
@@ -20,6 +22,7 @@ class Asteroid(circleshape.CircleShape):
         self.position += (self.velocity * dt)
 
     def split(self):
+        self.__explosion_sound.play()
         self.kill()
         if self.radius <= constants.ASTEROID_MIN_RADIUS:
             return

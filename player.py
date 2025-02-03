@@ -11,13 +11,15 @@ class Player(circleshape.CircleShape):
         self.weapon_cooldown = 0
         self.booster_reserves = 1
         self.booster_cooldown = 0
+        self.__shoot_sound = pygame.mixer.Sound("sounds/blaster_sound.wav")
+        self.__shoot_sound.set_volume(0.2)
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-        a = self.position + forward * self.radius
-        b = self.position - forward * self.radius - right
-        c = self.position - forward * self.radius + right
+        a = self.position + forward * (self.radius)
+        b = self.position - forward * (self.radius) - right
+        c = self.position - forward * (self.radius) + right
         return [a, b, c]
     
     def draw(self, screen):
@@ -46,6 +48,7 @@ class Player(circleshape.CircleShape):
         if self.weapon_cooldown > 0:
             print("Weapon on cooldown")
             return
+        self.__shoot_sound.play()
         self.weapon_cooldown = constants.PLAYER_WEAPON_COOLDOWN
         new_shot = shot.Shot(self.position.x, self.position.y)
         new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_BASE_SHOOT_SPEED
