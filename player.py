@@ -37,12 +37,28 @@ class Player(circleshape.CircleShape):
     def move(self, dt, with_boost = False):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         self.current_acceleration += constants.PLAYER_ACC
+        movement_vector = forward * self.current_acceleration
+        if movement_vector.length() > constants.PLAYER_SPEED:
+            movement_vector.scale_to_length(constants.PLAYER_SPEED)
         if with_boost:
-            self.position += forward * self.current_acceleration * dt * constants.PLAYER_BOOSTER_FACTOR
+            movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
-            return
-        self.position += forward * self.current_acceleration * dt
+        # if with_boost:
+        #     self.position += forward * self.current_acceleration * dt * constants.PLAYER_BOOSTER_FACTOR
+        #     self.booster_reserves -= 0.025
+        #     self.booster_reserves = max(0, self.booster_reserves)
+        #     return
+        print(movement_vector.length())
+        self.position += movement_vector * dt
+
+    def continue_to_drift(self, dt):
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        movement_vector = forward * self.current_acceleration
+        self.current_acceleration -= constants.PLAYER_DECEL
+        self.current_acceleration = max(0, self.current_acceleration)
+        self.position += movement_vector * dt
+
     
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
@@ -55,7 +71,7 @@ class Player(circleshape.CircleShape):
         self.__shoot_sound.play()
         self.weapon_cooldown = constants.PLAYER_WEAPON_COOLDOWN
         new_shot = shot.Shot(self.position.x, self.position.y)
-        new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_BASE_SHOOT_SPEED
+        new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_BASE_SHOOT_SPEED 
 
     def update(self, dt):
 
@@ -93,6 +109,8 @@ class Player(circleshape.CircleShape):
         if self.booster_cooldown <= 0:
             self.booster_reserves += 0.001
             self.booster_reserves = min(self.booster_reserves, 1)
+
+        self.continue_to_drift(dt)
 
 
     
