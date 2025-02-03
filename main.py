@@ -37,6 +37,10 @@ def main():
         0 + constants.RESOURCE_BAR_PADDING,
         constants.SCREEN_HEIGHT - constants.RESOURCE_BAR_HEIGHT - constants.RESOURCE_BAR_PADDING
     )
+    health_resource = resourcebar.ResourceBar(
+        0 + constants.RESOURCE_BAR_PADDING,
+        constants.SCREEN_HEIGHT - constants.RESOURCE_BAR_HEIGHT * 2 - constants.RESOURCE_BAR_PADDING * 2
+    )
     asteroidfield.AsteroidField()
 
     dt = 0
@@ -50,13 +54,14 @@ def main():
         screen.fill(constants.COLOR_BLACK)
         updatable.update(dt)
         booster_resource.update_available_resource(p.booster_reserves)
+        health_resource.update_available_resource(p.num_lives / constants.PLAYER_BASE_LIVES)
         for a in asteroids:
-            if a.is_colliding(p) and not p.num_lives == 0 and not p.is_dmg_immune:
+            if a.is_colliding(p) and not p.is_dmg_immune and p.num_lives > 0:
                 p.num_lives -= 1
                 print(f"extra life used, {p.num_lives} lives remaining")
                 p.is_dmg_immune = True
                 p.dmg_immunity_cooldown = constants.PLAYER_DMG_IMMUNITY_DURATION_POST_HIT
-            elif a.is_colliding(p) and p.num_lives == 0:
+            elif a.is_colliding(p) and not p.is_dmg_immune and p.num_lives <= 0:
                 print(f"You have died.")
                 print(f"Final Score: {score}")
                 exit(0)
