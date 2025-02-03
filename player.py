@@ -14,6 +14,7 @@ class Player(circleshape.CircleShape):
         self.num_lives = constants.PLAYER_BASE_LIVES
         self.is_dmg_immune = False
         self.dmg_immunity_cooldown = 0
+        self.current_acceleration = 0
         self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
     
@@ -35,12 +36,13 @@ class Player(circleshape.CircleShape):
 
     def move(self, dt, with_boost = False):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        self.current_acceleration += constants.PLAYER_ACC
         if with_boost:
-            self.position += forward * constants.PLAYER_SPEED * dt * constants.PLAYER_BOOSTER_FACTOR
+            self.position += forward * self.current_acceleration * dt * constants.PLAYER_BOOSTER_FACTOR
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
             return
-        self.position += forward * constants.PLAYER_SPEED * dt
+        self.position += forward * self.current_acceleration * dt
     
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
