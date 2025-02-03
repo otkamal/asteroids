@@ -51,7 +51,12 @@ def main():
         updatable.update(dt)
         booster_resource.update_available_resource(p.booster_reserves)
         for a in asteroids:
-            if a.is_colliding(p):
+            if a.is_colliding(p) and not p.num_lives == 0 and not p.is_dmg_immune:
+                p.num_lives -= 1
+                print(f"extra life used, {p.num_lives} lives remaining")
+                p.is_dmg_immune = True
+                p.dmg_immunity_cooldown = constants.PLAYER_DMG_IMMUNITY_DURATION_POST_HIT
+            elif a.is_colliding(p) and p.num_lives == 0:
                 print(f"You have died.")
                 print(f"Final Score: {score}")
                 exit(0)

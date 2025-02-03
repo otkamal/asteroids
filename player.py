@@ -8,9 +8,12 @@ class Player(circleshape.CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0
-        self.weapon_cooldown = 0
         self.booster_reserves = 1
+        self.weapon_cooldown = 0
         self.booster_cooldown = 0
+        self.num_lives = constants.PLAYER_BASE_LIVES
+        self.is_dmg_immune = False
+        self.dmg_immunity_cooldown = 0
         self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
     
@@ -25,7 +28,7 @@ class Player(circleshape.CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(
             screen,
-            constants.COLOR_WHITE,
+            constants.COLOR_WHITE if not self.is_dmg_immune else constants.COLOR_GRAY,
             self.triangle(),
             constants.PLAYER_LINE_WIDTH
         )
@@ -57,6 +60,7 @@ class Player(circleshape.CircleShape):
 
         self.booster_cooldown -= dt
         self.booster_cooldown = max(0, self.booster_cooldown)
+
         print(f"remaining cooldown: {self.booster_cooldown}")
 
         keys = pygame.key.get_pressed()
@@ -74,6 +78,12 @@ class Player(circleshape.CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot(dt)
+
+        if self.is_dmg_immune:
+            self.dmg_immunity_cooldown -= dt
+            self.dmg_immunity_cooldown = max(0, self.dmg_immunity_cooldown)
+            if self.dmg_immunity_cooldown == 0:
+                self.is_dmg_immune = False
 
         # if the player uses all of their booster => start a cooldown before recharging
         if self.booster_reserves == 0:
