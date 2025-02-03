@@ -56,10 +56,9 @@ class Player(circleshape.CircleShape):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         movement_vector = forward * self.current_acceleration
         self.current_acceleration -= constants.PLAYER_DECEL
-        self.current_acceleration = max(0, self.current_acceleration)
+        self.current_acceleration = max(30, self.current_acceleration)
         self.position += movement_vector * dt
 
-    
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
 
