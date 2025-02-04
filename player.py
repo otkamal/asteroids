@@ -17,6 +17,8 @@ class Player(circleshape.CircleShape):
         self.current_acceleration = 0
         self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
+        self.__last_direction = None
+        self.__just_boosted = False
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -34,30 +36,34 @@ class Player(circleshape.CircleShape):
             constants.PLAYER_LINE_WIDTH
         )
 
-    def move(self, dt, with_boost = False):
+    def move(self, dt, is_boosting = False):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.current_acceleration += constants.PLAYER_ACC
+        self.current_acceleration += constants.PLAYER_ACC * (-1 if dt < 0 else 1)
         movement_vector = forward * self.current_acceleration
         if movement_vector.length() > constants.PLAYER_SPEED:
             movement_vector.scale_to_length(constants.PLAYER_SPEED)
-        if with_boost:
+        if is_boosting:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
-        # if with_boost:
-        #     self.position += forward * self.current_acceleration * dt * constants.PLAYER_BOOSTER_FACTOR
-        #     self.booster_reserves -= 0.025
-        #     self.booster_reserves = max(0, self.booster_reserves)
-        #     return
-        print(movement_vector.length())
-        self.position += movement_vector * dt
+        self.position += movement_vector * abs(dt)
 
     def continue_to_drift(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         movement_vector = forward * self.current_acceleration
-        self.current_acceleration -= constants.PLAYER_DECEL
-        self.current_acceleration = max(25, self.current_acceleration)
-        self.position += movement_vector * dt
+        if movement_vector.length() > constants.PLAYER_SPEED and not self.__just_boosted:
+            movement_vector.scale_to_length(constants.PLAYER_SPEED)
+        if self.__just_boosted:
+            movement_vector *= constants.PLAYER_BOOSTER_FACTOR
+        if movement_vector.length() < constants.PLAYER_SPEED:
+            self.__just_boosted = False
+        if self.__last_direction == "W":
+            self.current_acceleration -= constants.PLAYER_DECEL
+            self.current_acceleration = max(25, self.current_acceleration)
+        elif self.__last_direction == "S":
+            self.current_acceleration += constants.PLAYER_DECEL
+            self.current_acceleration = min(self.current_acceleration, -25)
+        self.position += movement_vector * abs(dt)
 
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
@@ -84,11 +90,15 @@ class Player(circleshape.CircleShape):
         if keys[pygame.K_d]:
             self.rotate(dt)
         if keys[pygame.K_w]:
+            self.__last_direction = "W"
             if keys[pygame.K_LSHIFT] and self.booster_reserves > 0.01:
-                self.move(dt, True)
+                self.__just_boosted = True
+                self.is_boosting = True
+                self.move(dt)
             else:
                 self.move(dt)
         if keys[pygame.K_s]:
+            self.__last_direction = "S"
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot(dt)
@@ -110,6 +120,3 @@ class Player(circleshape.CircleShape):
             self.booster_reserves = min(self.booster_reserves, 1)
 
         self.continue_to_drift(dt)
-
-
-    
