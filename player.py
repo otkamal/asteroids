@@ -44,12 +44,15 @@ class Player(circleshape.CircleShape):
         movement_vector = forward * self.current_speed * constants.PLAYER_ACCELERATION
         if movement_vector.length() > constants.PLAYER_MAX_SPEED and not self.__just_boosted:
             movement_vector.scale_to_length(constants.PLAYER_MAX_SPEED)
-        elif movement_vector.length() > constants.PLAYER_MAX_SPEED and self.__just_boosted:
-            movement_vector.scale_to_length(min(movement_vector.length(), constants.PLAYER_MAX_BOOSTED_SPEED))
+        elif movement_vector.length() > constants.PLAYER_MAX_SPEED and self.__just_boosted and not is_boosting:
+            # just boosted but not right now
+            # want to slow down the rate of decay
+            movement_vector = forward * self.current_speed * (0.9994 / constants.PLAYER_DECELERATION)
         if is_boosting:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
-            movement_vector.scale_to_length(constants.PLAYER_MAX_BOOSTED_SPEED)
-            self.booster_reserves -= 0.025
+            if movement_vector.length() > constants.PLAYER_MAX_BOOSTED_SPEED:
+                movement_vector.scale_to_length(constants.PLAYER_MAX_BOOSTED_SPEED)
+            #self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
             self.__just_boosted = True
         self.current_speed = movement_vector.length()
