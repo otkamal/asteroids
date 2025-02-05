@@ -6,21 +6,77 @@ import asteroidfield
 import shot
 import resourcebar
 
+def main_menu(screen, clock):
+
+    background_track = pygame.mixer.Sound("sounds/start-menu-stranger-things-124008.mp3")
+    background_track.set_volume(constants.DEFAULT_VOLUME_BACKGROUND_TRACK)
+    background_track.play(-1)
+    menu_active = True
+    dt = 0
+    current_font_size = 12
+    is_decreasing = True
+    color = constants.COLOR_WHITE
+
+    while menu_active:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    menu_active = False
+
+        screen.fill(constants.COLOR_BLACK)
+
+        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, constants.COLOR_WHITE)
+        
+        if is_decreasing:
+            current_font_size -= 0.25
+            if current_font_size <= 3:
+                color = constants.COLOR_BLACK
+            if current_font_size <= 1:
+                is_decreasing = False
+        elif not is_decreasing:
+            current_font_size += 0.25
+            if current_font_size > 5:
+                color = constants.COLOR_WHITE
+            if current_font_size >= 12:
+                is_decreasing = True
+
+        print(current_font_size)
+        instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", int(current_font_size)).render("Press Enter to Start", True, color)
+
+        title_rect = title_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 ))
+        instruction_rect = instruction_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 325))
+
+        screen.blit(title_text, title_rect)
+        screen.blit(instruction_text, instruction_rect)
+
+        pygame.display.flip()
+        dt = clock.tick(constants.MAX_FPS)
+        # convert dt from milliseconds to seconds
+        dt /= 1000
+    
+    background_track.stop()
+
 def main():
 
     print("Starting asteroids!")
      
     pygame.init()
     pygame.font.init()
-    background_track = pygame.mixer.Sound(constants.FILEPATH_BACKGROUND_TRACK)
-    background_track.set_volume(constants.DEFAULT_VOLUME_BACKGROUND_TRACK)
-    background_track.play(-1)
 
     print(f"Screen width: {constants.SCREEN_WIDTH}")
     print(f"Screen height: {constants.SCREEN_HEIGHT}")
 
     screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+
+    main_menu(screen, clock)
+
+    background_track = pygame.mixer.Sound(constants.FILEPATH_BACKGROUND_TRACK)
+    background_track.set_volume(constants.DEFAULT_VOLUME_BACKGROUND_TRACK)
+    background_track.play(-1)
+    
     shots = pygame.sprite.Group()
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -46,7 +102,7 @@ def main():
     dt = 0
     score = 0
     while True:
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font("fonts/spacis/Spacis.ttf", 18)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print(f"Ending asteroids")
