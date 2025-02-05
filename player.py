@@ -47,7 +47,7 @@ class Player(circleshape.CircleShape):
         elif movement_vector.length() > constants.PLAYER_MAX_SPEED and self.__just_boosted and not is_boosting:
             # just boosted but not right now
             # want to slow down the rate of decay
-            movement_vector = forward * self.current_speed * (0.9994 / constants.PLAYER_DECELERATION)
+            movement_vector = forward * self.current_speed * (0.994 / constants.PLAYER_DECELERATION)
         if is_boosting:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             if movement_vector.length() > constants.PLAYER_MAX_BOOSTED_SPEED:
@@ -80,7 +80,7 @@ class Player(circleshape.CircleShape):
         self.current_speed = movement_vector.length()
         print(self.current_speed)
 
-        self.position += movement_vector * dt
+        self.position += movement_vector * dt * (1 if self.__last_direction == "W" else -1)
 
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
