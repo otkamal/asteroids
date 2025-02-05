@@ -42,12 +42,16 @@ class Player(circleshape.CircleShape):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         # scale the unit vector (1) by our current speed and (2) with an increase in acceleration
         movement_vector = forward * self.current_speed * constants.PLAYER_ACCELERATION
-        if movement_vector.length() > constants.PLAYER_MAX_SPEED:
+        if movement_vector.length() > constants.PLAYER_MAX_SPEED and not self.__just_boosted:
             movement_vector.scale_to_length(constants.PLAYER_MAX_SPEED)
+        elif movement_vector.length() > constants.PLAYER_MAX_SPEED and self.__just_boosted:
+            movement_vector.scale_to_length(min(movement_vector.length(), constants.PLAYER_MAX_BOOSTED_SPEED))
         if is_boosting:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
+            movement_vector.scale_to_length(constants.PLAYER_MAX_BOOSTED_SPEED)
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
+            self.__just_boosted = True
         self.current_speed = movement_vector.length()
         self.position += movement_vector * dt
 
@@ -58,8 +62,8 @@ class Player(circleshape.CircleShape):
         print(f"after - {movement_vector.length()}")
         # if movement_vector.length() > constants.PLAYER_MAX_SPEED and not self.__just_boosted:
         #     movement_vector.scale_to_length(constants.PLAYER_SPEED)
-        if self.__just_boosted:
-            movement_vector *= constants.PLAYER_BOOSTER_FACTOR
+        # if self.__just_boosted:
+        #     movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             # movement_vector.scale_to_length(min(movement_vector.length(), constants.PLAYER_SPEED * constants.PLAYER_BOOSTER_FACTOR))
         if movement_vector.length() <= constants.PLAYER_MAX_SPEED:
             self.__just_boosted = False
@@ -102,8 +106,6 @@ class Player(circleshape.CircleShape):
         if keys[pygame.K_w]:
             self.__last_direction = "W"
             if keys[pygame.K_LSHIFT] and self.booster_reserves > 0.01:
-                print("boost activated")
-                self.__just_boosted = True
                 self.move(dt, is_boosting = True)
             else:
                 self.move(dt)
