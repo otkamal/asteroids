@@ -14,7 +14,6 @@ class Player(circleshape.CircleShape):
         self.num_lives = constants.PLAYER_BASE_LIVES
         self.is_dmg_immune = False
         self.dmg_immunity_cooldown = 0
-        # self.current_acceleration = 0
         self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
         self.__last_direction = None
@@ -52,7 +51,7 @@ class Player(circleshape.CircleShape):
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             if movement_vector.length() > constants.PLAYER_MAX_BOOSTED_SPEED:
                 movement_vector.scale_to_length(constants.PLAYER_MAX_BOOSTED_SPEED)
-            #self.booster_reserves -= 0.025
+            self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
             self.__just_boosted = True
         self.current_speed = movement_vector.length()
@@ -60,26 +59,10 @@ class Player(circleshape.CircleShape):
 
     def continue_to_drift(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        print(f"before - {self.current_speed}")
         movement_vector = forward * self.current_speed * constants.PLAYER_DECELERATION
-        print(f"after - {movement_vector.length()}")
-        # if movement_vector.length() > constants.PLAYER_MAX_SPEED and not self.__just_boosted:
-        #     movement_vector.scale_to_length(constants.PLAYER_SPEED)
-        # if self.__just_boosted:
-        #     movement_vector *= constants.PLAYER_BOOSTER_FACTOR
-            # movement_vector.scale_to_length(min(movement_vector.length(), constants.PLAYER_SPEED * constants.PLAYER_BOOSTER_FACTOR))
         if movement_vector.length() <= constants.PLAYER_MAX_SPEED:
             self.__just_boosted = False
-
-        # if self.__last_direction == "W":
-        #     self.current_acceleration -= constants.PLAYER_DECEL
-        #     self.current_acceleration = max(50, self.current_acceleration)
-        # elif self.__last_direction == "S":
-        #     # self.current_acceleration += constants.PLAYER_DECEL
-        #     self.current_acceleration = min(self.current_acceleration, -50)
         self.current_speed = movement_vector.length()
-        print(self.current_speed)
-
         self.position += movement_vector * dt * (1 if self.__last_direction == "W" else -1)
 
     def rotate(self, dt):
@@ -133,5 +116,4 @@ class Player(circleshape.CircleShape):
         if self.booster_cooldown <= 0:
             self.booster_reserves += 0.001
             self.booster_reserves = min(self.booster_reserves, 1)
-        print(self.current_speed)
         self.continue_to_drift(dt)
