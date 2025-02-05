@@ -53,19 +53,21 @@ class Player(circleshape.CircleShape):
         movement_vector = forward * self.current_acceleration
         if movement_vector.length() > constants.PLAYER_SPEED and not self.__just_boosted:
             movement_vector.scale_to_length(constants.PLAYER_SPEED)
+            print(f"1 - movement vector {movement_vector.length()}")
         if self.__just_boosted:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             movement_vector.scale_to_length(min(movement_vector.length(), constants.PLAYER_SPEED * constants.PLAYER_BOOSTER_FACTOR))
             print("player boosted -- preserving scale")
-        if movement_vector.length() < constants.PLAYER_SPEED and self.__just_boosted:
+        print(movement_vector.length())
+        if movement_vector.length() <= constants.PLAYER_SPEED:
             self.__just_boosted = False
             print("end of boost momentum")
         if self.__last_direction == "W":
             self.current_acceleration -= constants.PLAYER_DECEL
-            self.current_acceleration = max(25, self.current_acceleration)
+            self.current_acceleration = max(50, self.current_acceleration)
         elif self.__last_direction == "S":
             self.current_acceleration += constants.PLAYER_DECEL
-            self.current_acceleration = min(self.current_acceleration, -25)
+            self.current_acceleration = min(self.current_acceleration, -50)
         self.position += movement_vector * abs(dt)
 
     def rotate(self, dt):
@@ -95,8 +97,9 @@ class Player(circleshape.CircleShape):
         if keys[pygame.K_w]:
             self.__last_direction = "W"
             if keys[pygame.K_LSHIFT] and self.booster_reserves > 0.01:
+                print("boost activated")
                 self.__just_boosted = True
-                self.move(dt, True)
+                self.move(dt, is_boosting = True)
             else:
                 self.move(dt)
         if keys[pygame.K_s]:
