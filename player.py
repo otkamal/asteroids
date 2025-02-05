@@ -16,6 +16,9 @@ class Player(circleshape.CircleShape):
         self.dmg_immunity_cooldown = 0
         self.__shoot_sound = pygame.mixer.Sound(constants.FILEPATH_PLAYER_SHOT)
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
+        self.__last_direction = None
+        self.__just_boosted = False
+        self.current_speed = 1
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -33,15 +36,35 @@ class Player(circleshape.CircleShape):
             constants.PLAYER_LINE_WIDTH
         )
 
-    def move(self, dt, with_boost = False):
+    def move(self, dt, is_boosting = False):
+        # define the basic unit vector in the direction that we're facing
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        if with_boost:
-            self.position += forward * constants.PLAYER_SPEED * dt * constants.PLAYER_BOOSTER_FACTOR
+        # scale the unit vector (1) by our current speed and (2) with an increase in acceleration
+        movement_vector = forward * self.current_speed * constants.PLAYER_ACCELERATION
+        if movement_vector.length() > constants.PLAYER_MAX_SPEED and not self.__just_boosted:
+            movement_vector.scale_to_length(constants.PLAYER_MAX_SPEED)
+        elif movement_vector.length() > constants.PLAYER_MAX_SPEED and self.__just_boosted and not is_boosting:
+            # just boosted but not right now
+            # want to slow down the rate of decay
+            movement_vector = forward * self.current_speed * (0.994 / constants.PLAYER_DECELERATION)
+        if is_boosting:
+            movement_vector *= constants.PLAYER_BOOSTER_FACTOR
+            if movement_vector.length() > constants.PLAYER_MAX_BOOSTED_SPEED:
+                movement_vector.scale_to_length(constants.PLAYER_MAX_BOOSTED_SPEED)
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
-            return
-        self.position += forward * constants.PLAYER_SPEED * dt
-    
+            self.__just_boosted = True
+        self.current_speed = movement_vector.length()
+        self.position += movement_vector * dt
+
+    def continue_to_drift(self, dt):
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        movement_vector = forward * self.current_speed * constants.PLAYER_DECELERATION
+        if movement_vector.length() <= constants.PLAYER_MAX_SPEED:
+            self.__just_boosted = False
+        self.current_speed = movement_vector.length()
+        self.position += movement_vector * dt * (1 if self.__last_direction == "W" else -1)
+
     def rotate(self, dt):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
 
@@ -53,7 +76,7 @@ class Player(circleshape.CircleShape):
         self.__shoot_sound.play()
         self.weapon_cooldown = constants.PLAYER_WEAPON_COOLDOWN
         new_shot = shot.Shot(self.position.x, self.position.y)
-        new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_BASE_SHOOT_SPEED
+        new_shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_BASE_SHOOT_SPEED 
 
     def update(self, dt):
 
@@ -67,11 +90,13 @@ class Player(circleshape.CircleShape):
         if keys[pygame.K_d]:
             self.rotate(dt)
         if keys[pygame.K_w]:
+            self.__last_direction = "W"
             if keys[pygame.K_LSHIFT] and self.booster_reserves > 0.01:
-                self.move(dt, True)
+                self.move(dt, is_boosting = True)
             else:
                 self.move(dt)
         if keys[pygame.K_s]:
+            self.__last_direction = "S"
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot(dt)
@@ -91,6 +116,4 @@ class Player(circleshape.CircleShape):
         if self.booster_cooldown <= 0:
             self.booster_reserves += 0.001
             self.booster_reserves = min(self.booster_reserves, 1)
-
-
-    
+        self.continue_to_drift(dt)
