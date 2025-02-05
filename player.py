@@ -19,6 +19,7 @@ class Player(circleshape.CircleShape):
         self.__shoot_sound.set_volume(constants.DEFAULT_VOLUME_PLAYER_SHOT)
         self.__last_direction = None
         self.__just_boosted = False
+        self.current_speed = 1
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -37,20 +38,23 @@ class Player(circleshape.CircleShape):
         )
 
     def move(self, dt, is_boosting = False):
+        # define the basic unit vector in the direction that we're facing
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.current_acceleration += constants.PLAYER_ACC * (-1 if dt < 0 else 1)
-        movement_vector = forward * self.current_acceleration
-        if movement_vector.length() > constants.PLAYER_SPEED:
-            movement_vector.scale_to_length(constants.PLAYER_SPEED)
+        # scale the unit vector (1) by our current speed and (2) with an increase in acceleration
+        movement_vector = forward * self.current_speed * constants.PLAYER_ACCELERATION
+        if movement_vector.length() > constants.PLAYER_MAX_SPEED:
+            movement_vector.scale_to_length(constants.PLAYER_MAX_SPEED)
         if is_boosting:
             movement_vector *= constants.PLAYER_BOOSTER_FACTOR
             self.booster_reserves -= 0.025
             self.booster_reserves = max(0, self.booster_reserves)
-        self.position += movement_vector * abs(dt)
+        self.current_speed = movement_vector.length()
+        self.position += movement_vector * dt
 
     def continue_to_drift(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         movement_vector = forward * self.current_acceleration
+
         if movement_vector.length() > constants.PLAYER_SPEED and not self.__just_boosted:
             movement_vector.scale_to_length(constants.PLAYER_SPEED)
             print(f"1 - movement vector {movement_vector.length()}")
@@ -123,5 +127,5 @@ class Player(circleshape.CircleShape):
         if self.booster_cooldown <= 0:
             self.booster_reserves += 0.001
             self.booster_reserves = min(self.booster_reserves, 1)
-
-        self.continue_to_drift(dt)
+        print(self.current_speed)
+        #self.continue_to_drift(dt)
