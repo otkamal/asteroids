@@ -5,6 +5,7 @@ import asteroid
 import asteroidfield
 import shot
 import resourcebar
+import math
 
 def main_menu(screen, clock):
 
@@ -13,25 +14,22 @@ def main_menu(screen, clock):
     background_track.play(-1)
     menu_active = True
     dt = 0
-    current_font_size = 12
-    is_decreasing = True
-    color = constants.COLOR_WHITE
     current_color = constants.COLOR_WHITE
     is_white = True
     white_value = 255
-    pause_initial = True
     drawable = pygame.sprite.Group()
-
+    color_val = 0
     updatable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
 
-    asteroid.Asteroid.containers = (asteroids, updatable, drawable)
+    # asteroid.Asteroid.containers = (asteroids, updatable, drawable)
+    # asteroidfield.AsteroidField.containers = (updatable)
+    # asteroidfield.AsteroidField()
 
-    asteroidfield.AsteroidField.containers = (updatable)
-
-    asteroidfield.AsteroidField()
-
+    countdown = 5.465
     while menu_active:
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit(0)
@@ -39,30 +37,43 @@ def main_menu(screen, clock):
                 if event.key == pygame.K_RETURN:
                     menu_active = False
 
-        screen.fill((127, 127, 127))
-
-        if is_white:
-            white_value -= 2.25
-            if white_value <= 20:
-                white_value = 20
-                is_white = False
-        elif not is_white:
-            white_value += 1.25
-            if white_value >= 255:
-                white_value = 255
-                is_white = True
+        screen.fill((color_val, color_val, color_val))
         
+        if countdown <= 0:
+            if is_white:
+                white_value -= 2.25
+                if white_value <= 70:
+                    white_value = 70
+                    is_white = False
+            elif not is_white:
+                white_value += 1.25
+                if white_value >= 255:
+                    white_value = 255
+                    is_white = True
+        
+
         current_color = (white_value, white_value, white_value)
+        main_color = (color_val, color_val, color_val)
+        if countdown > 0:
+            countdown -= dt
+            color_val += 1
+            color_val = min(170, math.ceil(color_val))
+            main_color = (color_val, color_val, color_val)
+            current_color = (color_val, color_val, color_val)
+        else:
+            main_color = (70, 70, 70)
+            color_val = 170
 
-        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, constants.COLOR_WHITE)
-
+        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, main_color)
         instruction_text = pygame.font.Font("fonts/astro_futuristic/as.ttf", 12).render("Press Enter to Start", True, current_color)
 
         title_rect = title_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 ))
         instruction_rect = instruction_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 200))
 
-        screen.blit(title_text, title_rect)
-        screen.blit(instruction_text, instruction_rect)
+        if countdown <= 0:
+            screen.blit(title_text, title_rect)
+            screen.blit(instruction_text, instruction_rect)
+
         updatable.update(dt)
         for d in drawable:
             d.draw(screen)
