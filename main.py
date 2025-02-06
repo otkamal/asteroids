@@ -39,7 +39,7 @@ def main_menu(screen, clock):
                 if event.key == pygame.K_RETURN:
                     menu_active = False
 
-        screen.fill(constants.COLOR_BLACK)
+        screen.fill((127, 127, 127))
 
         if is_white:
             white_value -= 2.25
@@ -56,7 +56,7 @@ def main_menu(screen, clock):
 
         title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, constants.COLOR_WHITE)
 
-        instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 12).render("Press Enter to Start", True, current_color)
+        instruction_text = pygame.font.Font("fonts/astro_futuristic/as.ttf", 12).render("Press Enter to Start", True, current_color)
 
         title_rect = title_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 ))
         instruction_rect = instruction_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 200))
@@ -122,7 +122,7 @@ def main():
             if event.type == pygame.QUIT:
                 print(f"Ending asteroids")
                 exit(0)
-        screen.fill(constants.COLOR_BLACK)
+        screen.fill((140, 140,140))
         updatable.update(dt)
         booster_resource.update_available_resource(p.booster_reserves)
         health_resource.update_available_resource(p.num_lives / constants.PLAYER_BASE_LIVES)
