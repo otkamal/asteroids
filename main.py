@@ -16,6 +16,20 @@ def main_menu(screen, clock):
     current_font_size = 12
     is_decreasing = True
     color = constants.COLOR_WHITE
+    current_color = constants.COLOR_WHITE
+    is_white = True
+    white_value = 255
+    pause_initial = True
+    drawable = pygame.sprite.Group()
+
+    updatable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+
+    asteroid.Asteroid.containers = (asteroids, updatable, drawable)
+
+    asteroidfield.AsteroidField.containers = (updatable)
+
+    asteroidfield.AsteroidField()
 
     while menu_active:
         for event in pygame.event.get():
@@ -27,30 +41,44 @@ def main_menu(screen, clock):
 
         screen.fill(constants.COLOR_BLACK)
 
-        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, constants.COLOR_WHITE)
+        if is_white:
+            white_value -= 2.25
+            if white_value <= 20:
+                white_value = 20
+                is_white = False
+        elif not is_white:
+            white_value += 1.25
+            if white_value >= 255:
+                white_value = 255
+                is_white = True
         
-        if is_decreasing:
-            current_font_size -= 0.25
-            if current_font_size <= 3:
-                color = constants.COLOR_BLACK
-            if current_font_size <= 1:
-                is_decreasing = False
-        elif not is_decreasing:
-            current_font_size += 0.25
-            if current_font_size > 5:
-                color = constants.COLOR_WHITE
-            if current_font_size >= 12:
-                is_decreasing = True
+        current_color = (white_value, white_value, white_value)
 
-        print(current_font_size)
-        instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", int(current_font_size)).render("Press Enter to Start", True, color)
+        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, (170, 170, 170))
+        
+        # if is_decreasing:
+        #     current_font_size -= 0.25
+        #     if current_font_size <= 3:
+        #         color = constants.COLOR_BLACK
+        #     if current_font_size <= 1:
+        #         is_decreasing = False
+        # elif not is_decreasing:
+        #     current_font_size += 0.25
+        #     if current_font_size > 5:
+        #         color = constants.COLOR_WHITE
+        #     if current_font_size >= 12.75:
+        #         is_decreasing = True
+
+        instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 12).render("Press Enter to Start", True, current_color)
 
         title_rect = title_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 ))
-        instruction_rect = instruction_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 325))
+        instruction_rect = instruction_text.get_rect(center = (constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 200))
 
         screen.blit(title_text, title_rect)
         screen.blit(instruction_text, instruction_rect)
-
+        updatable.update(dt)
+        for d in drawable:
+                    d.draw(screen)
         pygame.display.flip()
         dt = clock.tick(constants.MAX_FPS)
         # convert dt from milliseconds to seconds
