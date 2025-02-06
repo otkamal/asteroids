@@ -11,14 +11,14 @@ class Asteroid(circleshape.CircleShape):
         super().__init__(x, y, radius)
         self.__explosion_sound = pygame.mixer.Sound(constants.FILEPATH_ASTEROID_EXPLOSION)
         self.__explosion_sound.set_volume(constants.DEFAULT_VOLUME_ASTEROID_EXPLOSION)
-        #self.points = self.__generate_irregular_polygon(15)
+        self.points = self.__generate_irregular_polygon(15)
 
     def draw(self, screen):
-        points = self.__generate_irregular_polygon(10)
+        #points = self.__generate_irregular_polygon(10)
         pygame.draw.polygon(
             screen,
             constants.COLOR_WHITE,
-            points,
+            self.points,
             constants.ASTEROID_LINE_WIDTH
         )
         # pygame.draw.circle(
@@ -41,8 +41,8 @@ class Asteroid(circleshape.CircleShape):
         return points
 
     def update(self, dt):
-        self.position += (self.velocity * dt)
-        print(self.position)
+        for i in range(len(self.points)):
+            self.points[i] += (self.velocity * dt)
 
     def split(self):
         self.__explosion_sound.play()

@@ -54,7 +54,7 @@ def main_menu(screen, clock):
         
         current_color = (white_value, white_value, white_value)
 
-        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, (170, 170, 170))
+        title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, constants.COLOR_WHITE)
 
         instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 12).render("Press Enter to Start", True, current_color)
 
