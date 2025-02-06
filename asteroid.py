@@ -43,6 +43,7 @@ class Asteroid(circleshape.CircleShape):
     def update(self, dt):
         for i in range(len(self.points)):
             self.points[i] += (self.velocity * dt)
+        self.position += (self.velocity * dt)
 
     def split(self):
         self.__explosion_sound.play()
