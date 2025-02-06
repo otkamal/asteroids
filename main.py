@@ -55,19 +55,6 @@ def main_menu(screen, clock):
         current_color = (white_value, white_value, white_value)
 
         title_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 155).render("Asteroids", True, (170, 170, 170))
-        
-        # if is_decreasing:
-        #     current_font_size -= 0.25
-        #     if current_font_size <= 3:
-        #         color = constants.COLOR_BLACK
-        #     if current_font_size <= 1:
-        #         is_decreasing = False
-        # elif not is_decreasing:
-        #     current_font_size += 0.25
-        #     if current_font_size > 5:
-        #         color = constants.COLOR_WHITE
-        #     if current_font_size >= 12.75:
-        #         is_decreasing = True
 
         instruction_text = pygame.font.Font("fonts/spacis/Spacis.ttf", 12).render("Press Enter to Start", True, current_color)
 
@@ -78,7 +65,7 @@ def main_menu(screen, clock):
         screen.blit(instruction_text, instruction_rect)
         updatable.update(dt)
         for d in drawable:
-                    d.draw(screen)
+            d.draw(screen)
         pygame.display.flip()
         dt = clock.tick(constants.MAX_FPS)
         # convert dt from milliseconds to seconds
